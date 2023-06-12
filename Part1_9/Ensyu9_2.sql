@@ -46,3 +46,29 @@ WHERE
 	AND
 	emp = '相田'
 ;
+
+-- 別解
+SELECT
+  E1.emp -- 社員を取り出す
+FROM
+  /* EmpSkillsにSkillsテーブルを外部結合する、
+     EmpSkillsテーブルのうちSkillsテーブルにない言語はNULLになる*/
+  EmpSkills AS E1
+  LEFT OUTER JOIN Skills AS S1 ON E1.skill = S1.skill
+WHERE
+  -- 二つのスキルが一致している部分を取り出す
+  E1.skill = S1.skill
+-- 社員ごとにグループ化する
+GROUP BY
+  E1.emp
+-- それぞれの数が一致する社員はだれか
+HAVING
+  -- 社員ごとのグループからスキルの数を数える
+  COUNT(*) = (
+    SELECT
+      -- スキルテーブルの技術数を数える
+      COUNT(skill)
+    -- スキルテーブルから
+    FROM
+      Skills AS S2
+  );
